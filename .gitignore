@@ -2,6 +2,9 @@
 
 *.o
 
+*.d
+
 # misc
 .DS_Store
 
+rs
