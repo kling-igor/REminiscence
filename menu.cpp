@@ -8,6 +8,7 @@
 #include "menu.h"
 #include "resource.h"
 #include "systemstub.h"
+#include "screenshot.h"
 #include "util.h"
 #include "video.h"
 
@@ -18,7 +19,7 @@ Menu::Menu(Resource *res, SystemStub *stub, Video *vid)
 }
 
 void Menu::drawString(const char *str, int16_t y, int16_t x, uint8_t color) {
-	debug(DBG_MENU, "Menu::drawString()");
+	debug(DBG_MENU, "Menu::drawString('%s') at %d, %d", str, x, y);
 	uint8_t v1b = _vid->_charFrontColor;
 	uint8_t v2b = _vid->_charTransparentColor;
 	uint8_t v3b = _vid->_charShadowColor;
@@ -63,7 +64,7 @@ void Menu::drawString(const char *str, int16_t y, int16_t x, uint8_t color) {
 }
 
 void Menu::drawString2(const char *str, int16_t y, int16_t x) {
-	debug(DBG_MENU, "Menu::drawString2()");
+	debug(DBG_MENU, "Menu::drawString2('%s') at %d, %d", str, x, y);
 	int w = Video::CHAR_W;
 	int h = Video::CHAR_H;
 	int len = 0;
@@ -386,7 +387,8 @@ void Menu::handleTitleScreen() {
 		}
 	}
 
-	while (!quitLoop && !_stub->_pi.quit) {
+	while (!quitLoop && !_stub->_pi.quit) 
+	{
 
 		int selectedItem = -1;
 		int previousLanguage = currentLanguage;
@@ -498,6 +500,11 @@ void Menu::handleTitleScreen() {
 		_stub->sleep(EVENTS_DELAY);
 		_stub->processEvents();
 	}
+
+
+	// uint8_t palette[256 * 3];
+	// _stub->getPalette(palette, 256);
+	// saveBMP("instructions.bmp", _vid->_frontLayer, palette, _vid->_w, _vid->_h);
 }
 
 const char *Menu::getLevelPassword(int level, int skill) const {

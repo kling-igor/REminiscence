@@ -112,6 +112,7 @@ void Game::run() {
 			switch (_res._type) {
 			case kResourceTypeDOS:
 				_menu.handleTitleScreen();
+
 				if (_menu._selectedOption == Menu::MENU_OPTION_ITEM_QUIT || _stub->_pi.quit) {
 					_stub->_pi.quit = true;
 					break;
@@ -478,6 +479,8 @@ void Game::updateTiming() {
 }
 
 void Game::playCutscene(int id) {
+	return;
+
 	if (id != -1) {
 		_cut._id = id;
 	}
