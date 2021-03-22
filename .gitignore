@@ -1,0 +1,7 @@
+/DATA
+
+*.o
+
+# misc
+.DS_Store
+
