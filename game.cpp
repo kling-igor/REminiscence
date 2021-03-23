@@ -13,6 +13,7 @@
 #include "systemstub.h"
 #include "unpack.h"
 #include "util.h"
+#include "screenshot.h"
 
 Game::Game(SystemStub *stub, FileSystem *fs, const char *savePath, int level, ResourceType ver, Language lang, WidescreenMode widescreenMode, bool autoSave)
 	: _cut(&_res, stub, &_vid), _menu(&_res, stub, &_vid),
@@ -433,10 +434,12 @@ void Game::mainLoop() {
 			_vid.fullRefresh();
 		}
 	}
+
 	prepareAnims();
 	drawAnims();
 	drawCurrentInventoryItem();
 	drawLevelTexts();
+
 	if (g_options.enable_password_menu) {
 		printLevelCode();
 	}
@@ -1188,10 +1191,10 @@ void Game::drawAnimBuffer(uint8_t stateNum, AnimBufferState *state) {
 					break;
 				}
 				switch (_res._type) {
-				case kResourceTypeAmiga:
-					_vid.AMIGA_decodeSpm(state->dataPtr, _res._scratchBuffer);
-					drawCharacter(_res._scratchBuffer, state->x, state->y, state->h, state->w, pge->flags);
-					break;
+				// case kResourceTypeAmiga:
+				// 	_vid.AMIGA_decodeSpm(state->dataPtr, _res._scratchBuffer);
+				// 	drawCharacter(_res._scratchBuffer, state->x, state->y, state->h, state->w, pge->flags);
+				// 	break;
 				case kResourceTypeDOS:
 					if (!(state->dataPtr[-2] & 0x80)) {
 						_vid.PC_decodeSpm(state->dataPtr, _res._scratchBuffer);
@@ -1200,9 +1203,9 @@ void Game::drawAnimBuffer(uint8_t stateNum, AnimBufferState *state) {
 						drawCharacter(state->dataPtr, state->x, state->y, state->h, state->w, pge->flags);
 					}
 					break;
-				case kResourceTypeMac:
-					drawPiege(state);
-					break;
+				// case kResourceTypeMac:
+				// 	drawPiege(state);
+				// 	break;
 				}
 			} else {
 				drawPiege(state);
@@ -1219,20 +1222,20 @@ void Game::drawPiege(AnimBufferState *state) {
 	case kResourceTypeDOS:
 		drawObject(state->dataPtr, state->x, state->y, pge->flags);
 		break;
-	case kResourceTypeMac:
-		if (pge->flags & 8) {
-			_vid.MAC_drawSprite(state->x, state->y, _res._spc, pge->anim_number, (pge->flags & 2) != 0, _eraseBackground);
-		} else if (pge->index == 0) {
-			if (pge->anim_number == 0x386) {
-				break;
-			}
-			const int frame = _res.MAC_getPersoFrame(pge->anim_number);
-			_vid.MAC_drawSprite(state->x, state->y, _res._perso, frame, (pge->flags & 2) != 0, _eraseBackground);
-		} else {
-			const int frame = _res.MAC_getMonsterFrame(pge->anim_number);
-			_vid.MAC_drawSprite(state->x, state->y, _res._monster, frame, (pge->flags & 2) != 0, _eraseBackground);
-		}
-		break;
+	// case kResourceTypeMac:
+	// 	if (pge->flags & 8) {
+	// 		_vid.MAC_drawSprite(state->x, state->y, _res._spc, pge->anim_number, (pge->flags & 2) != 0, _eraseBackground);
+	// 	} else if (pge->index == 0) {
+	// 		if (pge->anim_number == 0x386) {
+	// 			break;
+	// 		}
+	// 		const int frame = _res.MAC_getPersoFrame(pge->anim_number);
+	// 		_vid.MAC_drawSprite(state->x, state->y, _res._perso, frame, (pge->flags & 2) != 0, _eraseBackground);
+	// 	} else {
+	// 		const int frame = _res.MAC_getMonsterFrame(pge->anim_number);
+	// 		_vid.MAC_drawSprite(state->x, state->y, _res._monster, frame, (pge->flags & 2) != 0, _eraseBackground);
+	// 	}
+	// 	break;
 	}
 }
 
@@ -1253,17 +1256,17 @@ void Game::drawObject(const uint8_t *dataPtr, int16_t x, int16_t y, uint8_t flag
 	}
 	int count = 0;
 	switch (_res._type) {
-	case kResourceTypeAmiga:
-		count = dataPtr[8];
-		dataPtr += 9;
-		break;
+	// case kResourceTypeAmiga:
+	// 	count = dataPtr[8];
+	// 	dataPtr += 9;
+	// 	break;
 	case kResourceTypeDOS:
 		count = dataPtr[5];
 		dataPtr += 6;
 		break;
-	case kResourceTypeMac:
-		assert(0); // different graphics format
-		break;
+	// case kResourceTypeMac:
+	// 	assert(0); // different graphics format
+	// 	break;
 	}
 	for (int i = 0; i < count; ++i) {
 		drawObjectFrame(data, dataPtr, posx, posy, flags);
@@ -1292,15 +1295,15 @@ void Game::drawObjectFrame(const uint8_t *bankDataPtr, const uint8_t *dataPtr, i
 	uint8_t sprite_w = (((sprite_flags >> 2) & 3) + 1) * 8;
 
 	switch (_res._type) {
-	case kResourceTypeAmiga:
-		_vid.AMIGA_decodeSpc(src, sprite_w, sprite_h, _res._scratchBuffer);
-		break;
+	// case kResourceTypeAmiga:
+	// 	_vid.AMIGA_decodeSpc(src, sprite_w, sprite_h, _res._scratchBuffer);
+	// 	break;
 	case kResourceTypeDOS:
 		_vid.PC_decodeSpc(src, sprite_w, sprite_h, _res._scratchBuffer);
 		break;
-	case kResourceTypeMac:
-		assert(0); // different graphics format
-		break;
+	// case kResourceTypeMac:
+	// 	assert(0); // different graphics format
+	// 	break;
 	}
 
 	src = _res._scratchBuffer;
@@ -1373,7 +1376,7 @@ void Game::drawObjectFrame(const uint8_t *bankDataPtr, const uint8_t *dataPtr, i
 }
 
 void Game::drawCharacter(const uint8_t *dataPtr, int16_t pos_x, int16_t pos_y, uint8_t a, uint8_t b, uint8_t flags) {
-	debug(DBG_GAME, "Game::drawCharacter(%p, %d, %d, 0x%X, 0x%X, 0x%X)", dataPtr, pos_x, pos_y, a, b, flags);
+	debug(DBG_CUSTOM, "Game::drawCharacter(%p, x=%d, y=%d, w=%d, h=%d, flags=0x%X)", dataPtr, pos_x, pos_y, a, b, flags);
 	bool var16 = false; // sprite_mirror_y
 	if (b & 0x40) {
 		b &= 0xBF;
@@ -1500,15 +1503,15 @@ int Game::loadMonsterSprites(LivePGE *pge) {
 	if (_curMonsterNum != mList[1]) {
 		_curMonsterNum = mList[1];
 		switch (_res._type) {
-		case kResourceTypeAmiga: {
-				_res.load(_monsterNames[1][_curMonsterNum], Resource::OT_SPM);
-				static const uint8_t tab[4] = { 0, 8, 0, 8 };
-				const int offset = _vid._mapPalSlot3 * 16 + tab[_curMonsterNum];
-				for (int i = 0; i < 8; ++i) {
-					_vid.setPaletteColorBE(0x50 + i, offset + i);
-				}
-			}
-			break;
+		// case kResourceTypeAmiga: {
+		// 		_res.load(_monsterNames[1][_curMonsterNum], Resource::OT_SPM);
+		// 		static const uint8_t tab[4] = { 0, 8, 0, 8 };
+		// 		const int offset = _vid._mapPalSlot3 * 16 + tab[_curMonsterNum];
+		// 		for (int i = 0; i < 8; ++i) {
+		// 			_vid.setPaletteColorBE(0x50 + i, offset + i);
+		// 		}
+		// 	}
+		// 	break;
 		case kResourceTypeDOS: {
 				const char *name = _monsterNames[0][_curMonsterNum];
 				_res.load(name, Resource::OT_SPRM);
@@ -1516,16 +1519,16 @@ int Game::loadMonsterSprites(LivePGE *pge) {
 				_vid.setPaletteSlotLE(5, _monsterPals[_curMonsterNum]);
 			}
 			break;
-		case kResourceTypeMac: {
-				Color palette[256];
-				_res.MAC_loadMonsterData(_monsterNames[0][_curMonsterNum], palette);
-				static const int kMonsterPalette = 5;
-				for (int i = 0; i < 16; ++i) {
-					const int color = kMonsterPalette * 16 + i;
-					_stub->setPaletteEntry(color, &palette[color]);
-				}
-			}
-			break;
+		// case kResourceTypeMac: {
+		// 		Color palette[256];
+		// 		_res.MAC_loadMonsterData(_monsterNames[0][_curMonsterNum], palette);
+		// 		static const int kMonsterPalette = 5;
+		// 		for (int i = 0; i < 16; ++i) {
+		// 			const int color = kMonsterPalette * 16 + i;
+		// 			_stub->setPaletteEntry(color, &palette[color]);
+		// 		}
+		// 	}
+		// 	break;
 		}
 	}
 	return 0xFFFF;
@@ -1548,76 +1551,122 @@ void Game::loadLevelMap() {
 	bool widescreenUpdated = false;
 	_currentIcon = 0xFF;
 	switch (_res._type) {
-	case kResourceTypeAmiga:
-		if (_currentLevel == 1) {
-			int num = 0;
-			switch (_currentRoom) {
-			case 14:
-			case 19:
-			case 52:
-			case 53:
-				num = 1;
-				break;
-			case 11:
-			case 24:
-			case 27:
-			case 56:
-				num = 2;
-				break;
-			}
-			if (num != 0 && _res._levNum != num) {
-				char name[9];
-				snprintf(name, sizeof(name), "level2_%d", num);
-				_res.load(name, Resource::OT_LEV);
-				_res._levNum = num;
-			}
-		}
-		_vid.AMIGA_decodeLev(_currentLevel, _currentRoom);
-		break;
+	// case kResourceTypeAmiga:
+	// 	if (_currentLevel == 1) {
+	// 		int num = 0;
+	// 		switch (_currentRoom) {
+	// 		case 14:
+	// 		case 19:
+	// 		case 52:
+	// 		case 53:
+	// 			num = 1;
+	// 			break;
+	// 		case 11:
+	// 		case 24:
+	// 		case 27:
+	// 		case 56:
+	// 			num = 2;
+	// 			break;
+	// 		}
+	// 		if (num != 0 && _res._levNum != num) {
+	// 			char name[9];
+	// 			snprintf(name, sizeof(name), "level2_%d", num);
+	// 			_res.load(name, Resource::OT_LEV);
+	// 			_res._levNum = num;
+	// 		}
+	// 	}
+	// 	_vid.AMIGA_decodeLev(_currentLevel, _currentRoom);
+	// 	break;
 	case kResourceTypeDOS:
-		if (_stub->hasWidescreen() && _widescreenMode == kWidescreenAdjacentRooms) {
-			const int leftRoom = _res._ctData[CT_LEFT_ROOM + _currentRoom];
-			if (leftRoom > 0 && hasLevelMap(_currentLevel, leftRoom)) {
-				_vid.PC_decodeMap(_currentLevel, leftRoom);
-				_stub->copyWidescreenLeft(Video::GAMESCREEN_W, Video::GAMESCREEN_H, _vid._backLayer);
-			} else {
-				_stub->copyWidescreenLeft(Video::GAMESCREEN_W, Video::GAMESCREEN_H, 0);
+		// if (_stub->hasWidescreen() && _widescreenMode == kWidescreenAdjacentRooms) {
+		// 	const int leftRoom = _res._ctData[CT_LEFT_ROOM + _currentRoom];
+		// 	if (leftRoom > 0 && hasLevelMap(_currentLevel, leftRoom)) {
+		// 		_vid.PC_decodeMap(_currentLevel, leftRoom);
+		// 		_stub->copyWidescreenLeft(Video::GAMESCREEN_W, Video::GAMESCREEN_H, _vid._backLayer);
+		// 	} else {
+		// 		_stub->copyWidescreenLeft(Video::GAMESCREEN_W, Video::GAMESCREEN_H, 0);
+		// 	}
+		// 	const int rightRoom = _res._ctData[CT_RIGHT_ROOM + _currentRoom];
+		// 	if (rightRoom > 0 && hasLevelMap(_currentLevel, rightRoom)) {
+		// 		_vid.PC_decodeMap(_currentLevel, rightRoom);
+		// 		_stub->copyWidescreenRight(Video::GAMESCREEN_W, Video::GAMESCREEN_H, _vid._backLayer);
+		// 	} else {
+		// 		_stub->copyWidescreenRight(Video::GAMESCREEN_W, Video::GAMESCREEN_H, 0);
+		// 	}
+		// 	widescreenUpdated = true;
+		// }
+
+// HACK
+/*
+// save all rooms
+		for (int i = 0; i < 64; i++) {
+			try {
+				if (!hasLevelMap(_currentLevel, i)) {
+					continue;
+				}
+
+				_vid.PC_decodeMap(_currentLevel, i);
+				char name[256];
+				sprintf(name, "mask_level-%d_room-%d.bmp", _currentLevel, i);
+
+				uint8_t palette[256 * 3];
+				_stub->getPalette(palette, 256);
+
+				// save mask only
+				// for (int j = 0; j < Video::GAMESCREEN_H; ++j) {
+				// 	for (int i = 0; i < Video::GAMESCREEN_W; ++i) {
+				// 		int p = _vid._frontLayer[j * Video::GAMESCREEN_H + i];
+				// 		if (!(p & 0x80)) {
+				// 			_vid._frontLayer[j * Video::GAMESCREEN_H + i] = 0;
+				// 		}
+				// 	}
+				// }
+
+				saveBMP(name, _vid._frontLayer, palette, _vid._w, _vid._h);
 			}
-			const int rightRoom = _res._ctData[CT_RIGHT_ROOM + _currentRoom];
-			if (rightRoom > 0 && hasLevelMap(_currentLevel, rightRoom)) {
-				_vid.PC_decodeMap(_currentLevel, rightRoom);
-				_stub->copyWidescreenRight(Video::GAMESCREEN_W, Video::GAMESCREEN_H, _vid._backLayer);
-			} else {
-				_stub->copyWidescreenRight(Video::GAMESCREEN_W, Video::GAMESCREEN_H, 0);
+			catch (...) {
+				
 			}
-			widescreenUpdated = true;
 		}
+*/		
+// HACK
+
 		_vid.PC_decodeMap(_currentLevel, _currentRoom);
+
+/******** SAVE *********/
+	// char name[256];
+	// sprintf(name, "room-%d.bmp", _currentRoom);
+
+	// uint8_t palette[256 * 3];
+	// _stub->getPalette(palette, 256);
+	// saveBMP(name, _vid._frontLayer, palette, _vid._w, _vid._h);
+	// _endLoop = true;
+/***********************/
 		break;
-	case kResourceTypeMac:
-		if (_stub->hasWidescreen() && _widescreenMode == kWidescreenAdjacentRooms) {
-			const int leftRoom = _res._ctData[CT_LEFT_ROOM + _currentRoom];
-			if (leftRoom > 0 && hasLevelMap(_currentLevel, leftRoom)) {
-				_vid.MAC_decodeMap(_currentLevel, leftRoom);
-				_stub->copyWidescreenLeft(_vid._w, _vid._h, _vid._backLayer);
-			} else {
-				_stub->copyWidescreenLeft(_vid._w, _vid._h, 0);
-			}
-			const int rightRoom = _res._ctData[CT_RIGHT_ROOM + _currentRoom];
-			if (rightRoom > 0 && hasLevelMap(_currentLevel, rightRoom)) {
-				_vid.MAC_decodeMap(_currentLevel, rightRoom);
-				_stub->copyWidescreenRight(_vid._w, _vid._h, _vid._backLayer);
-			} else {
-				_stub->copyWidescreenRight(_vid._w, _vid._h, 0);
-			}
-			widescreenUpdated = true;
-		}
-		_vid.MAC_decodeMap(_currentLevel, _currentRoom);
-		break;
+	// case kResourceTypeMac:
+	// 	if (_stub->hasWidescreen() && _widescreenMode == kWidescreenAdjacentRooms) {
+	// 		const int leftRoom = _res._ctData[CT_LEFT_ROOM + _currentRoom];
+	// 		if (leftRoom > 0 && hasLevelMap(_currentLevel, leftRoom)) {
+	// 			_vid.MAC_decodeMap(_currentLevel, leftRoom);
+	// 			_stub->copyWidescreenLeft(_vid._w, _vid._h, _vid._backLayer);
+	// 		} else {
+	// 			_stub->copyWidescreenLeft(_vid._w, _vid._h, 0);
+	// 		}
+	// 		const int rightRoom = _res._ctData[CT_RIGHT_ROOM + _currentRoom];
+	// 		if (rightRoom > 0 && hasLevelMap(_currentLevel, rightRoom)) {
+	// 			_vid.MAC_decodeMap(_currentLevel, rightRoom);
+	// 			_stub->copyWidescreenRight(_vid._w, _vid._h, _vid._backLayer);
+	// 		} else {
+	// 			_stub->copyWidescreenRight(_vid._w, _vid._h, 0);
+	// 		}
+	// 		widescreenUpdated = true;
+	// 	}
+	// 	_vid.MAC_decodeMap(_currentLevel, _currentRoom);
+	// 	break;
 	}
-	if (!widescreenUpdated) {
-		_vid.updateWidescreen();
-	}
+	// if (!widescreenUpdated) {
+		// _vid.updateWidescreen();
+	// }
 }
 
 void Game::loadLevelData() {
@@ -1753,50 +1802,50 @@ void Game::loadLevelData() {
 void Game::drawIcon(uint8_t iconNum, int16_t x, int16_t y, uint8_t colMask) {
 	uint8_t buf[16 * 16];
 	switch (_res._type) {
-	case kResourceTypeAmiga:
-		if (iconNum > 30) {
-			// inventory icons
-			switch (iconNum) {
-			case 76: // cursor
-				memset(buf, 0, 16 * 16);
-				for (int i = 0; i < 3; ++i) {
-					buf[i] = buf[15 * 16 + (15 - i)] = 1;
-					buf[i * 16] = buf[(15 - i) * 16 + 15] = 1;
-				}
-				break;
-			case 77: // up - icon.spr 4
-				memset(buf, 0, 16 * 16);
-				_vid.AMIGA_decodeIcn(_res._icn, 35, buf);
-				break;
-			case 78: // down - icon.spr 5
-				memset(buf, 0, 16 * 16);
-				_vid.AMIGA_decodeIcn(_res._icn, 36, buf);
-				break;
-			default:
-				memset(buf, 5, 16 * 16);
-				break;
-			}
-		} else {
-			_vid.AMIGA_decodeIcn(_res._icn, iconNum, buf);
-		}
-		break;
+	// case kResourceTypeAmiga:
+	// 	if (iconNum > 30) {
+	// 		// inventory icons
+	// 		switch (iconNum) {
+	// 		case 76: // cursor
+	// 			memset(buf, 0, 16 * 16);
+	// 			for (int i = 0; i < 3; ++i) {
+	// 				buf[i] = buf[15 * 16 + (15 - i)] = 1;
+	// 				buf[i * 16] = buf[(15 - i) * 16 + 15] = 1;
+	// 			}
+	// 			break;
+	// 		case 77: // up - icon.spr 4
+	// 			memset(buf, 0, 16 * 16);
+	// 			_vid.AMIGA_decodeIcn(_res._icn, 35, buf);
+	// 			break;
+	// 		case 78: // down - icon.spr 5
+	// 			memset(buf, 0, 16 * 16);
+	// 			_vid.AMIGA_decodeIcn(_res._icn, 36, buf);
+	// 			break;
+	// 		default:
+	// 			memset(buf, 5, 16 * 16);
+	// 			break;
+	// 		}
+	// 	} else {
+	// 		_vid.AMIGA_decodeIcn(_res._icn, iconNum, buf);
+	// 	}
+	// 	break;
 	case kResourceTypeDOS:
 		_vid.PC_decodeIcn(_res._icn, iconNum, buf);
 		break;
-	case kResourceTypeMac:
-		switch (iconNum) {
-		case 76: // cursor
-			iconNum = 32;
-			break;
-		case 77: // up
-			iconNum = 33;
-			break;
-		case 78: // down
-			iconNum = 34;
-			break;
-		}
-		_vid.MAC_drawSprite(x, y, _res._icn, iconNum, false, true);
-		return;
+	// case kResourceTypeMac:
+	// 	switch (iconNum) {
+	// 	case 76: // cursor
+	// 		iconNum = 32;
+	// 		break;
+	// 	case 77: // up
+	// 		iconNum = 33;
+	// 		break;
+	// 	case 78: // down
+	// 		iconNum = 34;
+	// 		break;
+	// 	}
+	// 	_vid.MAC_drawSprite(x, y, _res._icn, iconNum, false, true);
+	// 	return;
 	}
 	_vid.drawSpriteSub1(buf, _vid._frontLayer + x + y * _vid._w, 16, 16, 16, colMask << 4);
 	_vid.markBlockAsDirty(x, y, 16, 16, _vid._layerScale);

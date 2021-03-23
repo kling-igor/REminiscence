@@ -46,7 +46,8 @@ void error(const char *msg, ...) {
 #ifdef __ANDROID__
 	__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "%s", buf);
 #endif
-	exit(-1);
+	// exit(-1);
+	throw(buf);
 }
 
 void warning(const char *msg, ...) {
