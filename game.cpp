@@ -402,7 +402,9 @@ void Game::mainLoop() {
 			return;
 		}
 	}
+	// HACK - comment line to stop page refresh!!!!
 	memcpy(_vid._frontLayer, _vid._backLayer, _vid._layerSize);
+	// HACK
 	pge_getInput();
 	pge_prepare();
 	col_prepareRoomState();
