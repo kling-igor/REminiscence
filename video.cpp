@@ -797,7 +797,7 @@ void Video::AMIGA_decodeCmp(const uint8_t *src, uint8_t *dst) {
 }
 
 void Video::drawSpriteSub1(const uint8_t *src, uint8_t *dst, int pitch, int h, int w, uint8_t colMask) {
-	debug(DBG_CUSTOM, "Video::drawSpriteSub1(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
+	debug(DBG_VIDEO, "Video::drawSpriteSub1(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
 	while (h--) {
 		for (int i = 0; i < w; ++i) {
 			if (src[i] != 0) {
@@ -810,7 +810,7 @@ void Video::drawSpriteSub1(const uint8_t *src, uint8_t *dst, int pitch, int h, i
 }
 
 void Video::drawSpriteSub2(const uint8_t *src, uint8_t *dst, int pitch, int h, int w, uint8_t colMask) {
-	debug(DBG_CUSTOM, "Video::drawSpriteSub2(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
+	debug(DBG_VIDEO, "Video::drawSpriteSub2(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
 	while (h--) {
 		for (int i = 0; i < w; ++i) {
 			if (src[-i] != 0) {
@@ -823,7 +823,7 @@ void Video::drawSpriteSub2(const uint8_t *src, uint8_t *dst, int pitch, int h, i
 }
 
 void Video::drawSpriteSub3(const uint8_t *src, uint8_t *dst, int pitch, int h, int w, uint8_t colMask) {
-	debug(DBG_CUSTOM, "Video::drawSpriteSub3(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
+	debug(DBG_VIDEO, "Video::drawSpriteSub3(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
 	while (h--) {
 		for (int i = 0; i < w; ++i) {
 			if (src[i] != 0 && !(dst[i] & 0x80)) { // определяет как смешиавется с фоном
@@ -836,7 +836,7 @@ void Video::drawSpriteSub3(const uint8_t *src, uint8_t *dst, int pitch, int h, i
 }
 
 void Video::drawSpriteSub4(const uint8_t *src, uint8_t *dst, int pitch, int h, int w, uint8_t colMask) {
-	debug(DBG_CUSTOM, "Video::drawSpriteSub4(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
+	debug(DBG_VIDEO, "Video::drawSpriteSub4(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
 	while (h--) {
 		for (int i = 0; i < w; ++i) {
 			if (src[-i] != 0 && !(dst[i] & 0x80)) { // определяет как смешиавется с фоном
@@ -849,7 +849,7 @@ void Video::drawSpriteSub4(const uint8_t *src, uint8_t *dst, int pitch, int h, i
 }
 
 void Video::drawSpriteSub5(const uint8_t *src, uint8_t *dst, int pitch, int h, int w, uint8_t colMask) {
-	debug(DBG_CUSTOM, "Video::drawSpriteSub5(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
+	debug(DBG_VIDEO, "Video::drawSpriteSub5(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
 	while (h--) {
 		for (int i = 0; i < w; ++i) {
 			if (src[i * pitch] != 0 && !(dst[i] & 0x80)) { // определяет как смешиавется с фоном
@@ -862,7 +862,7 @@ void Video::drawSpriteSub5(const uint8_t *src, uint8_t *dst, int pitch, int h, i
 }
 
 void Video::drawSpriteSub6(const uint8_t *src, uint8_t *dst, int pitch, int h, int w, uint8_t colMask) {
-	debug(DBG_CUSTOM, "Video::drawSpriteSub6(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
+	debug(DBG_VIDEO, "Video::drawSpriteSub6(0x%X, 0x%X, 0x%X, 0x%X)", pitch, w, h, colMask);
 	while (h--) {
 		for (int i = 0; i < w; ++i) {
 			if (src[-i * pitch] != 0 && !(dst[i] & 0x80)) { // определяет как смешиавется с фоном

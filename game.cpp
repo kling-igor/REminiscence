@@ -75,8 +75,10 @@ void Game::run() {
 			displayTitleScreenMac(Menu::kMacTitleScreen_Presage);
 		}
 	}
-	playCutscene(0x40);
-	playCutscene(0x0D);
+	// HACK
+	// playCutscene(0x40);// DOLPHIN
+	playCutscene(0x0D);// INTRO
+	// HACK
 
 	switch (_res._type) {
 	case kResourceTypeAmiga:
@@ -484,15 +486,23 @@ void Game::updateTiming() {
 }
 
 void Game::playCutscene(int id) {
-	return;
+	debug(DBG_CUSTOM, "playCutscene %d", id);
+	// HACK
+	// return;
+	// HACK
 
 	if (id != -1) {
 		_cut._id = id;
 	}
+
 	if (_cut._id != 0xFFFF) {
+		
 		if (_stub->hasWidescreen()) {
 			_stub->enableWidescreen(false);
 		}
+
+	debug(DBG_CUSTOM, "playCutscene _cut._id=%d", _cut._id);
+
 		_mix.stopMusic();
 		if (_res._hasSeqData) {
 			int num = 0;
@@ -528,13 +538,13 @@ void Game::playCutscene(int id) {
 				return;
 			}
 			if (SeqPlayer::_namesTable[_cut._id]) {
-			        char name[16];
-			        snprintf(name, sizeof(name), "%s.SEQ", SeqPlayer::_namesTable[_cut._id]);
+			  char name[16];
+			  snprintf(name, sizeof(name), "%s.SEQ", SeqPlayer::_namesTable[_cut._id]);
 				char *p = strchr(name, '0');
 				if (p) {
 					*p += num;
 				}
-			        if (playCutsceneSeq(name)) {
+			  if (playCutsceneSeq(name)) {
 					if (_cut._id == 0x3D) {
 						playCutsceneSeq("CREDITS.SEQ");
 						_cut._interrupted = false;
@@ -545,9 +555,12 @@ void Game::playCutscene(int id) {
 				}
 			}
 		}
+
+		// HACK
 		if (_cut._id != 0x4A) {
 			_mix.playMusic(Cutscene::_musicTable[_cut._id]);
 		}
+		// HACK
 		_cut.play();
 		if (id == 0xD && !_cut._interrupted) {
 			const bool extendedIntroduction = (_res._type == kResourceTypeDOS || _res._type == kResourceTypeMac);
@@ -576,6 +589,8 @@ void Game::playCutscene(int id) {
 }
 
 bool Game::playCutsceneSeq(const char *name) {
+	debug(DBG_CUSTOM, "playCutsceneSeq %s", name);
+
 	File f;
 	if (f.open(name, "rb", _fs)) {
 		_seq.setBackBuffer(_res._scratchBuffer);
@@ -1459,6 +1474,14 @@ void Game::drawCharacter(const uint8_t *dataPtr, int16_t pos_x, int16_t pos_y, u
 			src += sprite_w - 1;
 		}
 	}
+
+
+	// HACK
+	// DROW SPRITE AT THE FIXED SCREEN POSITION
+	pos_x = 0;
+	pos_y = 0;
+	// HACK
+
 
 	uint32_t dst_offset = 256 * pos_y + pos_x;
 	uint8_t sprite_col_mask = ((flags & 0x60) == 0x60) ? 0x50 : 0x40;

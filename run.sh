@@ -1,3 +1,4 @@
 #!/bin/bash
 
-./rs --datapath=./DATA --scaler=scale@1 --language=en
+# SDL_AUDIODRIVER=disk SDL_DISKAUDIOFILE=audio.wav 
+./rs --datapath=./DATA --language=en

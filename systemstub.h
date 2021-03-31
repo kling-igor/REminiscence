@@ -86,6 +86,8 @@ struct SystemStub {
 	virtual uint32_t getOutputSampleRate() = 0;
 	virtual void lockAudio() = 0;
 	virtual void unlockAudio() = 0;
+
+	virtual void saveScreen(int frame) = 0; 
 };
 
 struct LockAudioStack {

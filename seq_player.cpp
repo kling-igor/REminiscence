@@ -226,12 +226,18 @@ SeqPlayer::~SeqPlayer() {
 }
 
 void SeqPlayer::play(File *f) {
+	debug(DBG_CUSTOM, "SeqPlayer::play");
+
 	if (_demux.open(f)) {
 		uint8_t palette[256 * 3];
 		_stub->getPalette(palette, 256);
 		_mix->setPremixHook(mixCallback, this);
 		memset(_buf, 0, 256 * 224);
 		bool clearScreen = true;
+
+
+		int counter = 0;
+
 		while (true) {
 			const uint32_t nextFrameTimeStamp = _stub->getTimeStamp() + 1000 / 25;
 			_stub->processEvents();
@@ -242,36 +248,36 @@ void SeqPlayer::play(File *f) {
 			if (!_demux.readFrameData()) {
 				break;
 			}
-			if (_demux._audioDataSize != 0) {
-				SoundBufferQueue *sbq = (SoundBufferQueue *)malloc(sizeof(SoundBufferQueue));
-				if (sbq) {
-					sbq->data = (int16_t *)calloc(SeqDemuxer::kAudioBufferSize, sizeof(int16_t));
-					if (sbq->data) {
-						_demux.readAudio(sbq->data);
-						sbq->size = SeqDemuxer::kAudioBufferSize;
-						sbq->read = 0;
-						sbq->next = 0;
-					} else {
-						free(sbq);
-						sbq = 0;
-					}
-				}
-				if (sbq) {
-					LockAudioStack las(_stub);
-					if (!_soundQueue) {
-						_soundQueue = sbq;
-					} else {
-						SoundBufferQueue *p = _soundQueue;
-						while (p->next) {
-							p = p->next;
-						}
-						p->next = sbq;
-					}
-					if (_soundQueuePreloadSize < kSoundPreloadSize) {
-						++_soundQueuePreloadSize;
-					}
-				}
-			}
+			// if (_demux._audioDataSize != 0) {
+			// 	SoundBufferQueue *sbq = (SoundBufferQueue *)malloc(sizeof(SoundBufferQueue));
+			// 	if (sbq) {
+			// 		sbq->data = (int16_t *)calloc(SeqDemuxer::kAudioBufferSize, sizeof(int16_t));
+			// 		if (sbq->data) {
+			// 			_demux.readAudio(sbq->data);
+			// 			sbq->size = SeqDemuxer::kAudioBufferSize;
+			// 			sbq->read = 0;
+			// 			sbq->next = 0;
+			// 		} else {
+			// 			free(sbq);
+			// 			sbq = 0;
+			// 		}
+			// 	}
+			// 	if (sbq) {
+			// 		LockAudioStack las(_stub);
+			// 		if (!_soundQueue) {
+			// 			_soundQueue = sbq;
+			// 		} else {
+			// 			SoundBufferQueue *p = _soundQueue;
+			// 			while (p->next) {
+			// 				p = p->next;
+			// 			}
+			// 			p->next = sbq;
+			// 		}
+			// 		if (_soundQueuePreloadSize < kSoundPreloadSize) {
+			// 			++_soundQueuePreloadSize;
+			// 		}
+			// 	}
+			// }
 			if (_demux._paletteDataSize != 0) {
 				uint8_t buf[256 * 3];
 				_demux.readPalette(buf);
@@ -308,6 +314,10 @@ void SeqPlayer::play(File *f) {
 					_stub->copyRect(0, y0, kVideoWidth, kVideoHeight, _buf, 256);
 				}
 				_stub->updateScreen(0);
+
+				// SAVE SEQUENCE SCREEN HERE
+
+				// _stub->saveScreen(counter++);
 			}
 			const int diff = nextFrameTimeStamp - _stub->getTimeStamp();
 			if (diff > 0) {

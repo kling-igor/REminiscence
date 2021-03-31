@@ -11,6 +11,9 @@
 #include "util.h"
 #include "video.h"
 
+
+static int counter = 0;
+
 static void scalePoints(Point *pt, int count, int scale) {
 	if (scale != 1) {
 		while (count-- > 0) {
@@ -42,6 +45,7 @@ void Cutscene::sync() {
 	if (_stub->_pi.dbgMask & PlayerInput::DF_FASTMODE) {
 		return;
 	}
+
 	const int32_t delay = _stub->getTimeStamp() - _tstamp;
 	const int32_t pause = _frameDelay * TIMER_SLICE - delay;
 	if (pause > 0) {
@@ -969,6 +973,7 @@ uint16_t Cutscene::fetchNextCmdWord() {
 }
 
 void Cutscene::mainLoop(uint16_t num) {
+	debug(DBG_CUSTOM, "Cutscene::mainLoop(%d)", num);
 	_frameDelay = 5;
 	_tstamp = _stub->getTimeStamp();
 
@@ -1007,21 +1012,28 @@ void Cutscene::mainLoop(uint16_t num) {
 		}
 		(this->*_opcodeTable[op])();
 		_stub->processEvents();
+
 		if (_stub->_pi.backspace) {
 			_stub->_pi.backspace = false;
 			_interrupted = true;
 		}
+
+		// HACK SAVE SCREEN !!!
+		//_stub->saveScreen(counter++);
+		// HACK
 	}
 }
 
 bool Cutscene::load(uint16_t cutName) {
 	assert(cutName != 0xFFFF);
 	const char *name = _namesTableDOS[cutName & 0xFF];
+	debug(DBG_CUSTOM, "Cutscene::load(%d) cutName=%s", cutName, name);
 	switch (_res->_type) {
 	case kResourceTypeAmiga:
 		if (cutName == 7) {
 			name = "INTRO";
-		} else if (cutName == 10) {
+		} 
+		else if (cutName == 10) {
 			name = "SERRURE";
 		}
 		_res->load(name, Resource::OT_CMP);
@@ -1154,9 +1166,10 @@ void Cutscene::playText(const char *str) {
 }
 
 void Cutscene::play() {
+		debug(DBG_CUT, "Cutscene::play() _id=0x%X", _id);
+
 	if (_id != 0xFFFF) {
 		_textCurBuf = NULL;
-		debug(DBG_CUT, "Cutscene::play() _id=0x%X", _id);
 		_creditsSequence = false;
 		prepare();
 		const uint16_t *offsets = _res->isAmiga() ? _offsetsTableAmiga : _offsetsTableDOS;
@@ -1359,6 +1372,7 @@ void Cutscene::playSet(const uint8_t *p, int offset) {
 
 		_stub->copyRect(0, 0, _vid->_w, _vid->_h, _page1, _vid->_w);
 		_stub->updateScreen(0);
+
 		const int diff = 6 * TIMER_SLICE - (_stub->getTimeStamp() - timestamp);
 		_stub->sleep((diff < 16) ? 16 : diff);
 		_stub->processEvents();
