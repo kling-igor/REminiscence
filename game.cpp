@@ -15,6 +15,8 @@
 #include "util.h"
 #include "screenshot.h"
 
+#include "conf.h"
+
 Game::Game(SystemStub *stub, FileSystem *fs, const char *savePath, int level, ResourceType ver, Language lang, WidescreenMode widescreenMode, bool autoSave)
 	: _cut(&_res, stub, &_vid), _menu(&_res, stub, &_vid),
 	_mix(fs, stub), _res(fs, ver, lang), _seq(stub, &_mix), _vid(&_res, stub, widescreenMode),
@@ -76,8 +78,15 @@ void Game::run() {
 		}
 	}
 	// HACK
-	// playCutscene(0x40);// DOLPHIN
+
+#ifdef PLAYCUTSCENE
+	playCutscene(PLAYCUTSCENE);
+#endif
+
+#ifndef SKIP_INTRO
+	playCutscene(0x40);// DOLPHIN
 	playCutscene(0x0D);// INTRO
+#endif
 	// HACK
 
 	switch (_res._type) {
@@ -405,7 +414,9 @@ void Game::mainLoop() {
 		}
 	}
 	// HACK - comment line to stop page refresh!!!!
+	#ifndef DO_NOT_REFRESH
 	memcpy(_vid._frontLayer, _vid._backLayer, _vid._layerSize);
+	#endif
 	// HACK
 	pge_getInput();
 	pge_prepare();
@@ -487,9 +498,11 @@ void Game::updateTiming() {
 
 void Game::playCutscene(int id) {
 	debug(DBG_CUSTOM, "playCutscene %d", id);
+	#ifdef DO_NOT_PLAY_CUTSCENES
 	// HACK
-	// return;
+	return;
 	// HACK
+	#endif
 
 	if (id != -1) {
 		_cut._id = id;
@@ -1477,9 +1490,10 @@ void Game::drawCharacter(const uint8_t *dataPtr, int16_t pos_x, int16_t pos_y, u
 
 
 	// HACK
-	// DROW SPRITE AT THE FIXED SCREEN POSITION
+	#ifdef DRAW_SPRITE_AT_FIXED_POSITION
 	pos_x = 0;
 	pos_y = 0;
+	#endif
 	// HACK
 
 

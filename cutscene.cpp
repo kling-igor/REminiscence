@@ -10,6 +10,7 @@
 #include "systemstub.h"
 #include "util.h"
 #include "video.h"
+#include "conf.h"
 
 
 static int counter = 0;
@@ -1019,7 +1020,9 @@ void Cutscene::mainLoop(uint16_t num) {
 		}
 
 		// HACK SAVE SCREEN !!!
-		//_stub->saveScreen(counter++);
+		#ifdef SAVE_SCREENSHOTS
+		_stub->saveScreen(counter++);
+		#endif
 		// HACK
 	}
 }
