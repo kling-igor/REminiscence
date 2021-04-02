@@ -239,7 +239,7 @@ static void PC_decodeMapPlane(int sz, const uint8_t *src, uint8_t *dst) {
 }
 
 void Video::PC_decodeMap(int level, int room) {
-	debug(DBG_CUSTOM, "Video::PC_decodeMap level=%d room=%d", level, room);
+	debug(DBG_VIDEO, "Video::PC_decodeMap level=%d room=%d", level, room);
 	if (!_res->_map) {
 		assert(_res->_lev);
 		PC_decodeLev(level, room);

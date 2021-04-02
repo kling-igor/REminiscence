@@ -226,8 +226,6 @@ SeqPlayer::~SeqPlayer() {
 }
 
 void SeqPlayer::play(File *f) {
-	debug(DBG_CUSTOM, "SeqPlayer::play");
-
 	if (_demux.open(f)) {
 		uint8_t palette[256 * 3];
 		_stub->getPalette(palette, 256);

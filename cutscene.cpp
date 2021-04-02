@@ -974,7 +974,7 @@ uint16_t Cutscene::fetchNextCmdWord() {
 }
 
 void Cutscene::mainLoop(uint16_t num) {
-	debug(DBG_CUSTOM, "Cutscene::mainLoop(%d)", num);
+	debug(DBG_CUT, "Cutscene::mainLoop(%d)", num);
 	_frameDelay = 5;
 	_tstamp = _stub->getTimeStamp();
 
@@ -1030,7 +1030,7 @@ void Cutscene::mainLoop(uint16_t num) {
 bool Cutscene::load(uint16_t cutName) {
 	assert(cutName != 0xFFFF);
 	const char *name = _namesTableDOS[cutName & 0xFF];
-	debug(DBG_CUSTOM, "Cutscene::load(%d) cutName=%s", cutName, name);
+	debug(DBG_CUT, "Cutscene::load(%d) cutName=%s", cutName, name);
 	switch (_res->_type) {
 	case kResourceTypeAmiga:
 		if (cutName == 7) {

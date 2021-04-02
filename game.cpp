@@ -497,7 +497,7 @@ void Game::updateTiming() {
 }
 
 void Game::playCutscene(int id) {
-	debug(DBG_CUSTOM, "playCutscene %d", id);
+	debug(DBG_CUT, "playCutscene %d", id);
 	#ifdef DO_NOT_PLAY_CUTSCENES
 	// HACK
 	return;
@@ -514,7 +514,7 @@ void Game::playCutscene(int id) {
 			_stub->enableWidescreen(false);
 		}
 
-	debug(DBG_CUSTOM, "playCutscene _cut._id=%d", _cut._id);
+	debug(DBG_CUT, "playCutscene _cut._id=%d", _cut._id);
 
 		_mix.stopMusic();
 		if (_res._hasSeqData) {
@@ -602,7 +602,7 @@ void Game::playCutscene(int id) {
 }
 
 bool Game::playCutsceneSeq(const char *name) {
-	debug(DBG_CUSTOM, "playCutsceneSeq %s", name);
+	debug(DBG_CUT, "playCutsceneSeq %s", name);
 
 	File f;
 	if (f.open(name, "rb", _fs)) {
@@ -1227,10 +1227,16 @@ void Game::drawAnimBuffer(uint8_t stateNum, AnimBufferState *state) {
 				// 	break;
 				case kResourceTypeDOS:
 					if (!(state->dataPtr[-2] & 0x80)) {
-						_vid.PC_decodeSpm(state->dataPtr, _res._scratchBuffer);
-						drawCharacter(_res._scratchBuffer, state->x, state->y, state->h, state->w, pge->flags);
+						// HACK DRAW ONLY CONRAD
+						if (stateNum == 1) {
+							_vid.PC_decodeSpm(state->dataPtr, _res._scratchBuffer);
+							drawCharacter(_res._scratchBuffer, state->x, state->y, state->h, state->w, pge->flags);
+						}
 					} else {
-						drawCharacter(state->dataPtr, state->x, state->y, state->h, state->w, pge->flags);
+						// HACK DRAW ONLY CONRAD
+						if (stateNum == 1) {
+							drawCharacter(state->dataPtr, state->x, state->y, state->h, state->w, pge->flags);
+						}
 					}
 					break;
 				// case kResourceTypeMac:
@@ -1270,7 +1276,8 @@ void Game::drawPiege(AnimBufferState *state) {
 }
 
 void Game::drawObject(const uint8_t *dataPtr, int16_t x, int16_t y, uint8_t flags) {
-	debug(DBG_GAME, "Game::drawObject() dataPtr[]=0x%X dx=%d dy=%d",  dataPtr[0], (int8_t)dataPtr[1], (int8_t)dataPtr[2]);
+
+	//debug(DBG_CUSTOM, "Game::drawObject() dx=%d, dy=%d, x=%d, y=%d",  (int8_t)dataPtr[1], (int8_t)dataPtr[2], x, y);
 	assert(dataPtr[0] < 0x4A);
 	uint8_t slot = _res._rp[dataPtr[0]];
 	uint8_t *data = _res.findBankData(slot);
@@ -1406,7 +1413,17 @@ void Game::drawObjectFrame(const uint8_t *bankDataPtr, const uint8_t *dataPtr, i
 }
 
 void Game::drawCharacter(const uint8_t *dataPtr, int16_t pos_x, int16_t pos_y, uint8_t a, uint8_t b, uint8_t flags) {
-	debug(DBG_CUSTOM, "Game::drawCharacter(%p, x=%d, y=%d, w=%d, h=%d, flags=0x%X)", dataPtr, pos_x, pos_y, a, b, flags);
+	
+	static const uint8_t *_dataPt = NULL;
+	static int16_t _x = 0;
+	static int16_t _y = 0;
+
+	if (dataPtr != _dataPt) {
+		_dataPt = dataPtr;
+		_x = 0;
+		_y = 0;
+	}
+
 	bool var16 = false; // sprite_mirror_y
 	if (b & 0x40) {
 		b &= 0xBF;
@@ -1496,6 +1513,12 @@ void Game::drawCharacter(const uint8_t *dataPtr, int16_t pos_x, int16_t pos_y, u
 	#endif
 	// HACK
 
+	if (dataPtr == _dataPt && (pos_x != _x || pos_y != _y)) {
+		_x = pos_x;
+		_y = pos_y;
+
+		debug(DBG_CUSTOM, "Game::drawCharacter(x=%d, y=%d, w=%d, h=%d, flags=0x%X)", pos_x, pos_y, b, a, flags);
+	}
 
 	uint32_t dst_offset = 256 * pos_y + pos_x;
 	uint8_t sprite_col_mask = ((flags & 0x60) == 0x60) ? 0x50 : 0x40;
