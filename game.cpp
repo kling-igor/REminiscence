@@ -2102,7 +2102,7 @@ void Game::inp_update() {
 }
 
 void Game::makeGameStateName(uint8_t slot, char *buf) {
-	sprintf(buf, "rs-level%d-%02d.state", _currentLevel + 1, slot);
+	sprintf(buf, "save-level%d-%02d.state", _currentLevel + 1, slot);
 }
 
 static const uint32_t TAG_FBSV = 0x46425356;
@@ -2175,7 +2175,11 @@ bool Game::loadGameState(uint8_t slot) {
 
 void Game::saveState(File *f) {
 	f->writeByte(_skillLevel);
+	debug(DBG_FILE, "skillLevel=%d", _skillLevel);
+
 	f->writeUint32BE(_score);
+	debug(DBG_FILE, "score=%d", _score);
+
 	if (_col_slots2Cur == 0) {
 		f->writeUint32BE(0xFFFFFFFF);
 	} else {
@@ -2187,22 +2191,53 @@ void Game::saveState(File *f) {
 		f->writeUint32BE(_col_slots2Next - &_col_slots2[0]);
 	}
 	for (int i = 0; i < _res._pgeNum; ++i) {
+		debug(DBG_FILE, "item=%d", i);
 		LivePGE *pge = &_pgeLive[i];
 		f->writeUint16BE(pge->obj_type);
+		debug(DBG_FILE, "obj_type=%d", pge->obj_type);
+		
 		f->writeUint16BE(pge->pos_x);
+		debug(DBG_FILE, "pos_x=%d", pge->pos_x);
+		
 		f->writeUint16BE(pge->pos_y);
+		debug(DBG_FILE, "pos_y=%d", pge->pos_y);
+		
 		f->writeByte(pge->anim_seq);
+		debug(DBG_FILE, "anim_seq=%d", pge->anim_seq);
+		
 		f->writeByte(pge->room_location);
+		debug(DBG_FILE, "room_location=%d", pge->room_location);
+		
 		f->writeUint16BE(pge->life);
+		debug(DBG_FILE, "life=%d", pge->life);
+		
 		f->writeUint16BE(pge->counter_value);
+		debug(DBG_FILE, "counter_value=%d", pge->counter_value);
+		
 		f->writeByte(pge->collision_slot);
+		debug(DBG_FILE, "collision_slot=%d", pge->collision_slot);
+		
 		f->writeByte(pge->next_inventory_PGE);
+		debug(DBG_FILE, "next_inventory_PGE=%d", pge->next_inventory_PGE);
+		
 		f->writeByte(pge->current_inventory_PGE);
+		debug(DBG_FILE, "current_inventory_PGE=%d", pge->current_inventory_PGE);
+		
 		f->writeByte(pge->unkF);
+		debug(DBG_FILE, "unkF=%d", pge->unkF);
+		
 		f->writeUint16BE(pge->anim_number);
+		debug(DBG_FILE, "anim_number=%d", pge->anim_number);
+		
 		f->writeByte(pge->flags);
+		debug(DBG_FILE, "flags=%d", pge->flags);
+		
 		f->writeByte(pge->index);
+		debug(DBG_FILE, "index=%d", pge->index);
+		
 		f->writeUint16BE(pge->first_obj_number);
+		debug(DBG_FILE, "first_obj_number=%d", pge->first_obj_number);
+		
 		if (pge->next_PGE_in_room == 0) {
 			f->writeUint32BE(0xFFFFFFFF);
 		} else {

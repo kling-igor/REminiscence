@@ -266,7 +266,7 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	initOptions();
-	g_debugMask = /*DBG_INFO | DBG_RES | DBG_MENU | DBG_GAME | DBG_UNPACK | DBG_FILE |*/ DBG_CUSTOM; // DBG_CUT | DBG_VIDEO | DBG_RES | DBG_MENU | DBG_PGE | DBG_GAME | DBG_UNPACK | DBG_COL | DBG_MOD | DBG_SFX | DBG_FILE;
+	g_debugMask = /*DBG_INFO | DBG_RES | DBG_MENU | DBG_GAME | DBG_UNPACK | DBG_FILE |*/ DBG_CUSTOM | DBG_FILE; // DBG_CUT | DBG_VIDEO | DBG_RES | DBG_MENU | DBG_PGE | DBG_GAME | DBG_UNPACK | DBG_COL | DBG_MOD | DBG_SFX | DBG_FILE;
 	FileSystem fs(dataPath);
 	const int version = detectVersion(&fs);
 	if (version == -1) {
