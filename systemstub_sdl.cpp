@@ -93,6 +93,7 @@ struct SystemStub_SDL : SystemStub {
 	void drawRect(int x, int y, int w, int h, uint8_t color);
 
 	void saveScreen(int frame); 
+	void saveFullScreen(int frame);
 };
 
 SystemStub *SystemStub_SDL_create() {
@@ -1122,6 +1123,24 @@ void SystemStub_SDL::drawRect(int x, int y, int w, int h, uint8_t color) {
 	for (int j = y1; j <= y2; ++j) {
 		*(_screenBuffer + j * _screenW + x1) = *(_screenBuffer + j * _screenW + x2) = _rgbPalette[color];
 	}
+}
+
+void SystemStub_SDL::saveFullScreen(int frame) {
+	char fname[256];
+	snprintf(fname, sizeof(fname), "seq_%05d.bmp", frame);
+
+	SDL_Texture* target = SDL_GetRenderTarget(_renderer);
+	SDL_SetRenderTarget(_renderer, _texture);
+	int width, height;
+	SDL_QueryTexture(_texture, NULL, NULL, &width, &height);
+	SDL_Surface* surface = SDL_CreateRGBSurface(0, 256, 224, 32, 0, 0, 0, 0);
+	// INTRO SCENE SIZE
+	SDL_Rect rect = {0, 0, 256, 224};
+
+	SDL_RenderReadPixels(_renderer, &rect, surface->format->format, surface->pixels, surface->pitch);
+	SDL_SaveBMP(surface, fname);
+	SDL_FreeSurface(surface);
+	SDL_SetRenderTarget(_renderer, target);
 }
 
 void SystemStub_SDL::saveScreen(int frame) {

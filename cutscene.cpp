@@ -1020,7 +1020,7 @@ void Cutscene::mainLoop(uint16_t num) {
 		}
 
 		// HACK SAVE SCREEN !!!
-		#ifdef SAVE_SCREENSHOTS
+		#ifdef SAVE_CUTSCENE_SCREENSHOTS
 		_stub->saveScreen(counter++);
 		#endif
 		// HACK

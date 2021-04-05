@@ -88,6 +88,7 @@ struct SystemStub {
 	virtual void unlockAudio() = 0;
 
 	virtual void saveScreen(int frame) = 0; 
+	virtual void saveFullScreen(int frame) = 0; 
 };
 
 struct LockAudioStack {

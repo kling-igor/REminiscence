@@ -17,6 +17,8 @@
 
 #include "conf.h"
 
+int counter = 0;
+
 Game::Game(SystemStub *stub, FileSystem *fs, const char *savePath, int level, ResourceType ver, Language lang, WidescreenMode widescreenMode, bool autoSave)
 	: _cut(&_res, stub, &_vid), _menu(&_res, stub, &_vid),
 	_mix(fs, stub), _res(fs, ver, lang), _seq(stub, &_mix), _vid(&_res, stub, widescreenMode),
@@ -462,6 +464,11 @@ void Game::mainLoop() {
 		--_blinkingConradCounter;
 	}
 	_vid.updateScreen();
+
+	#ifdef SAVE_GAMEPLAY_SCREENSHOTS
+	_stub->saveFullScreen(counter++);
+	#endif
+
 	updateTiming();
 	drawStoryTexts();
 	if (_stub->_pi.backspace) {
@@ -486,7 +493,7 @@ void Game::mainLoop() {
 }
 
 void Game::updateTiming() {
-	static const int frameHz = 30;
+	static const int frameHz = FPS;
 	int32_t delay = _stub->getTimeStamp() - _frameTimestamp;
 	int32_t pause = (_stub->_pi.dbgMask & PlayerInput::DF_FASTMODE) ? 20 : (1000 / frameHz);
 	pause -= delay;
