@@ -18,6 +18,7 @@
 #include "conf.h"
 
 int counter = 0;
+int __cutScene__ = 0;
 
 Game::Game(SystemStub *stub, FileSystem *fs, const char *savePath, int level, ResourceType ver, Language lang, WidescreenMode widescreenMode, bool autoSave)
 	: _cut(&_res, stub, &_vid), _menu(&_res, stub, &_vid),
@@ -504,11 +505,18 @@ void Game::updateTiming() {
 }
 
 void Game::playCutscene(int id) {
-	debug(DBG_CUT, "playCutscene %d", id);
+	counter = 1;
+	__cutScene__ = id;
+
+	debug(DBG_CUSTOM, "playCutscene %d", id);
 	#ifdef DO_NOT_PLAY_CUTSCENES
-	// HACK
 	return;
-	// HACK
+	#endif
+
+	#ifdef SKIP_INTRO
+		if (id == 0) {
+			return;
+		}
 	#endif
 
 	if (id != -1) {
@@ -581,12 +589,12 @@ void Game::playCutscene(int id) {
 			_mix.playMusic(Cutscene::_musicTable[_cut._id]);
 		}
 		// HACK
-		_cut.play();
+		_cut.play(__cutScene__);
 		if (id == 0xD && !_cut._interrupted) {
 			const bool extendedIntroduction = (_res._type == kResourceTypeDOS || _res._type == kResourceTypeMac);
 			if (extendedIntroduction) {
 				_cut._id = 0x4A;
-				_cut.play();
+				_cut.play(0x4A);
 			}
 		}
 		if (_res._type == kResourceTypeMac && !(id == 0x48 || id == 0x49)) { // continue or score screens
@@ -609,7 +617,7 @@ void Game::playCutscene(int id) {
 }
 
 bool Game::playCutsceneSeq(const char *name) {
-	debug(DBG_CUT, "playCutsceneSeq %s", name);
+	debug(DBG_CUSTOM, "playCutsceneSeq %s", name);
 
 	File f;
 	if (f.open(name, "rb", _fs)) {
@@ -1235,15 +1243,24 @@ void Game::drawAnimBuffer(uint8_t stateNum, AnimBufferState *state) {
 				case kResourceTypeDOS:
 					if (!(state->dataPtr[-2] & 0x80)) {
 						// HACK DRAW ONLY CONRAD
+						#ifdef DRAW_ONLY_CONRAD
 						if (stateNum == 1) {
 							_vid.PC_decodeSpm(state->dataPtr, _res._scratchBuffer);
 							drawCharacter(_res._scratchBuffer, state->x, state->y, state->h, state->w, pge->flags);
 						}
+						#else
+						_vid.PC_decodeSpm(state->dataPtr, _res._scratchBuffer);
+						drawCharacter(_res._scratchBuffer, state->x, state->y, state->h, state->w, pge->flags);
+						#endif
+
 					} else {
-						// HACK DRAW ONLY CONRAD
+						#ifdef DRAW_ONLY_CONRAD
 						if (stateNum == 1) {
 							drawCharacter(state->dataPtr, state->x, state->y, state->h, state->w, pge->flags);
 						}
+						#else
+							drawCharacter(state->dataPtr, state->x, state->y, state->h, state->w, pge->flags);
+						#endif
 					}
 					break;
 				// case kResourceTypeMac:
@@ -1524,7 +1541,7 @@ void Game::drawCharacter(const uint8_t *dataPtr, int16_t pos_x, int16_t pos_y, u
 		_x = pos_x;
 		_y = pos_y;
 
-		debug(DBG_CUSTOM, "Game::drawCharacter(x=%d, y=%d, w=%d, h=%d, flags=0x%X)", pos_x, pos_y, b, a, flags);
+		debug(DBG_GAME, "Game::drawCharacter(x=%d, y=%d, w=%d, h=%d, flags=0x%X)", pos_x, pos_y, b, a, flags);
 	}
 
 	uint32_t dst_offset = 256 * pos_y + pos_x;

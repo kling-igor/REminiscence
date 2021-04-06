@@ -92,7 +92,7 @@ struct SystemStub_SDL : SystemStub {
 	void changeScaler(int scalerNum);
 	void drawRect(int x, int y, int w, int h, uint8_t color);
 
-	void saveScreen(int frame); 
+	void saveScreen(int prefix, int frame); 
 	void saveFullScreen(int frame);
 };
 
@@ -1143,9 +1143,9 @@ void SystemStub_SDL::saveFullScreen(int frame) {
 	SDL_SetRenderTarget(_renderer, target);
 }
 
-void SystemStub_SDL::saveScreen(int frame) {
+void SystemStub_SDL::saveScreen(int prefix, int frame) {
 	char fname[256];
-	snprintf(fname, sizeof(fname), "seq_%05d.bmp", frame);
+	snprintf(fname, sizeof(fname), "seq_%02d_%05d.bmp", prefix, frame);
 
 	SDL_Texture* target = SDL_GetRenderTarget(_renderer);
 	SDL_SetRenderTarget(_renderer, _texture);

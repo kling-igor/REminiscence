@@ -973,7 +973,7 @@ uint16_t Cutscene::fetchNextCmdWord() {
 	return i;
 }
 
-void Cutscene::mainLoop(uint16_t num) {
+void Cutscene::mainLoop(uint16_t num, int prefix) {
 	debug(DBG_CUT, "Cutscene::mainLoop(%d)", num);
 	_frameDelay = 5;
 	_tstamp = _stub->getTimeStamp();
@@ -1021,7 +1021,7 @@ void Cutscene::mainLoop(uint16_t num) {
 
 		// HACK SAVE SCREEN !!!
 		#ifdef SAVE_CUTSCENE_SCREENSHOTS
-		_stub->saveScreen(counter++);
+		_stub->saveScreen(prefix, counter++);
 		#endif
 		// HACK
 	}
@@ -1130,7 +1130,7 @@ void Cutscene::playCredits() {
 		uint16_t cutName = offsets[cut_id * 2 + 0];
 		uint16_t cutOff  = offsets[cut_id * 2 + 1];
 		if (load(cutName)) {
-			mainLoop(cutOff);
+			mainLoop(cutOff, 99);
 			unload();
 		}
 	}
@@ -1168,8 +1168,15 @@ void Cutscene::playText(const char *str) {
 	}
 }
 
-void Cutscene::play() {
-		debug(DBG_CUT, "Cutscene::play() _id=0x%X", _id);
+void Cutscene::play(int prefix) {
+	//debug(DBG_CUT, "Cutscene::play() _id=0x%X", _id);
+
+	#ifdef SKIP_INTRO
+	if (_id == 0) {
+		return;
+	}
+	#endif
+	
 
 	if (_id != 0xFFFF) {
 		_textCurBuf = NULL;
@@ -1231,7 +1238,7 @@ void Cutscene::play() {
 			}
 		} else if (cutName != 0xFFFF) {
 			if (load(cutName)) {
-				mainLoop(cutOff);
+				mainLoop(cutOff, prefix);
 				unload();
 			}
 		} else if (_id == 8 && g_options.play_caillou_cutscene) {

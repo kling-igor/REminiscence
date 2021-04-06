@@ -11,6 +11,8 @@
 #include "systemstub.h"
 #include "util.h"
 
+static int seqCounter = 0;
+
 bool SeqDemuxer::open(File *f) {
 	_f = f;
 	_fileSize = _f->size();
@@ -233,9 +235,6 @@ void SeqPlayer::play(File *f) {
 		memset(_buf, 0, 256 * 224);
 		bool clearScreen = true;
 
-
-		int counter = 0;
-
 		while (true) {
 			const uint32_t nextFrameTimeStamp = _stub->getTimeStamp() + 1000 / 25;
 			_stub->processEvents();
@@ -315,7 +314,11 @@ void SeqPlayer::play(File *f) {
 
 				// SAVE SEQUENCE SCREEN HERE
 
-				// _stub->saveScreen(counter++);
+				// HACK SAVE SCREEN !!!
+				#ifdef SAVE_CUTSCENE_SCREENSHOTS
+				_stub->saveScreen(0, seqCounter++);
+				#endif
+				// HACK
 			}
 			const int diff = nextFrameTimeStamp - _stub->getTimeStamp();
 			if (diff > 0) {

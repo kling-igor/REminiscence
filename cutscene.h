@@ -140,13 +140,13 @@ struct Cutscene {
 
 	uint8_t fetchNextCmdByte();
 	uint16_t fetchNextCmdWord();
-	void mainLoop(uint16_t num);
+	void mainLoop(uint16_t num, int prefix);
 	bool load(uint16_t cutName);
 	void unload();
 	void prepare();
 	void playCredits();
 	void playText(const char *str);
-	void play();
+	void play(int prefix);
 
 	void drawSetShape(const uint8_t *p, uint16_t offset, int x, int y, uint8_t *paletteLut);
 	void playSet(const uint8_t *p, int offset);

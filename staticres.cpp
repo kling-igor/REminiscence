@@ -31,41 +31,41 @@ const Cutscene::OpcodeStub Cutscene::_opcodeTable[] = {
 };
 
 const char *Cutscene::_namesTableDOS[] = {
-	"DEBUT",
-	"OBJET",
-	"CARTE",
-	"GEN",
-	"CHUTE",
-	"CODE",
-	"DESINTEG",
-	"INTRO1",
-	"STREM",
-	"HOLOSEQ",
-	"CARTEID",
-	"PONT",
-	"ASC",
-	"MAP",
-	"METRO",
-	"MISSIONS",
-	"GENMIS",
-	"MEMO",
-	"TAXI",
-	"ACCROCHE",
-	"VOYAGE",
-	"TELEPORT",
-	"LIFT",
-	"ESPIONS",
-	"LOG",
-	"FIN",
-	"GENEXP",
-	"LOGOS",
-	"OVER",
-	"SCORE",
-	"INTRO2",
-	"SERRURE",
-	"HOLOCUBE",
-	"CHUTE2",
-	"LOGOSSSI",
+	"DEBUT", // 0
+	"OBJET", // 1
+	"CARTE", // 2
+	"GEN",	// 3
+	"CHUTE",	// 4
+	"CODE",// 5
+	"DESINTEG",// 6
+	"INTRO1",	// 7
+	"STREM", // 8
+	"HOLOSEQ",	// 9
+	"CARTEID",	// 10
+	"PONT",	// 11
+	"ASC",	// 12
+	"MAP",	// 13
+	"METRO",	// 14
+	"MISSIONS",	// 15
+	"GENMIS",	// 16
+	"MEMO",	// 17
+	"TAXI",	// 18
+	"ACCROCHE", // 19
+	"VOYAGE",	// 20
+	"TELEPORT", // 21
+	"LIFT",	// 22
+	"ESPIONS", // 23
+	"LOG",	// 24
+	"FIN",	// 25
+	"GENEXP", // 26
+	"LOGOS", // 27
+	"OVER", // 28
+	"SCORE", // 29
+	"INTRO2", // 30
+	"SERRURE", // 31
+	"HOLOCUBE", // 32
+	"CHUTE2", // 33
+	"LOGOSSSI", // 34
 };
 
 const uint16_t Cutscene::_offsetsTableDOS[] = {
