@@ -508,10 +508,11 @@ void Game::playCutscene(int id) {
 	counter = 1;
 	__cutScene__ = id;
 
-	debug(DBG_CUSTOM, "playCutscene %d", id);
 	#ifdef DO_NOT_PLAY_CUTSCENES
 	return;
 	#endif
+
+	debug(DBG_CUSTOM, "playCutscene %d", id);
 
 	#ifdef SKIP_INTRO
 		if (id == 0) {
