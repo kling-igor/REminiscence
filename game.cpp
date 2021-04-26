@@ -530,7 +530,7 @@ void Game::playCutscene(int id) {
 			_stub->enableWidescreen(false);
 		}
 
-	debug(DBG_CUT, "playCutscene _cut._id=%d", _cut._id);
+	debug(DBG_CUSTOM, "playCutscene _cut._id=%d", _cut._id);
 
 		_mix.stopMusic();
 		if (_res._hasSeqData) {

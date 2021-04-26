@@ -1030,7 +1030,7 @@ void Cutscene::mainLoop(uint16_t num, int prefix) {
 bool Cutscene::load(uint16_t cutName) {
 	assert(cutName != 0xFFFF);
 	const char *name = _namesTableDOS[cutName & 0xFF];
-	debug(DBG_CUT, "Cutscene::load(%d) cutName=%s", cutName, name);
+	debug(DBG_CUSTOM, "Cutscene::load(%d) cutName=%s", cutName, name);
 	switch (_res->_type) {
 	case kResourceTypeAmiga:
 		if (cutName == 7) {
@@ -1169,7 +1169,7 @@ void Cutscene::playText(const char *str) {
 }
 
 void Cutscene::play(int prefix) {
-	//debug(DBG_CUT, "Cutscene::play() _id=0x%X", _id);
+	debug(DBG_CUSTOM, "Cutscene::play() _id=0x%X", _id);
 
 	#ifdef SKIP_INTRO
 	if (_id == 0) {
@@ -1219,6 +1219,7 @@ void Cutscene::play(int prefix) {
 				break;
 			}
 		}
+
 		if (_patchedOffsetsTable) {
 			for (int i = 0; _patchedOffsetsTable[i] != 255; i += 3) {
 				if (_patchedOffsetsTable[i] == _id) {
@@ -1228,6 +1229,7 @@ void Cutscene::play(int prefix) {
 				}
 			}
 		}
+
 		if (g_options.use_text_cutscenes) {
 			const Text *textsTable = (_res->_lang == LANG_FR) ? _frTextsTable : _enTextsTable;
 			for (int i = 0; textsTable[i].str; ++i) {
@@ -1306,6 +1308,7 @@ static const int kMaxShapesCount = 16;
 static const int kMaxPaletteSize = 32;
 
 void Cutscene::playSet(const uint8_t *p, int offset) {
+	debug(DBG_CUT, "Cutscene::playSet()");
 	SetShape backgroundShapes[kMaxShapesCount];
 	const int bgCount = READ_BE_UINT16(p + offset); offset += 2;
 	assert(bgCount <= kMaxShapesCount);
@@ -1390,5 +1393,9 @@ void Cutscene::playSet(const uint8_t *p, int offset) {
 			_stub->_pi.backspace = false;
 			_interrupted = true;
 		}
+
+		#ifdef SAVE_CUTSCENE_SCREENSHOTS
+		_stub->saveScreen(8, i);
+		#endif
 	}
 }
