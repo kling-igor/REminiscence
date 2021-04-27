@@ -1,7 +1,7 @@
 #ifndef __CONF_H__
 #define __CONF_H__
 
-// #define SAVE_CUTSCENE_SCREENSHOTS
+//#define SAVE_CUTSCENE_SCREENSHOTS
 
 // #define SAVE_GAMEPLAY_SCREENSHOTS
 
