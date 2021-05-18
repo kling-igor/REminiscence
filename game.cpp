@@ -1522,8 +1522,14 @@ void Game::drawAnimBuffer(uint8_t stateNum, AnimBufferState *state)
 							drawCharacter(_res._scratchBuffer, state->x, state->y, state->h, state->w, pge->flags);
 						}
 #else
-						_vid.PC_decodeSpm(state->dataPtr, _res._scratchBuffer);
-						drawCharacter(_res._scratchBuffer, state->x, state->y, state->h, state->w, pge->flags);
+#ifdef DO_NOT_DRAW_CONRAD
+						if (stateNum != 1)
+#endif
+						{
+							_vid.PC_decodeSpm(state->dataPtr, _res._scratchBuffer);
+							drawCharacter(_res._scratchBuffer, state->x, state->y, state->h, state->w, pge->flags);
+						}
+
 #endif
 					}
 					else
@@ -1534,7 +1540,12 @@ void Game::drawAnimBuffer(uint8_t stateNum, AnimBufferState *state)
 							drawCharacter(state->dataPtr, state->x, state->y, state->h, state->w, pge->flags);
 						}
 #else
-						drawCharacter(state->dataPtr, state->x, state->y, state->h, state->w, pge->flags);
+#ifdef DO_NOT_DRAW_CONRAD
+						if (stateNum != 1)
+#endif
+						{
+							drawCharacter(state->dataPtr, state->x, state->y, state->h, state->w, pge->flags);
+						}
 #endif
 					}
 					break;
